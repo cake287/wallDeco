@@ -129,6 +129,49 @@ function shadeGradient(col1, col2, factor, steps=undefined) {
 }
 
 
+let lastValidCode = "";
+function drawShapes(frame) {
+  // run user inputted shading program
+
+  const userCode = ace.edit("editor").getValue();
+  const getShadingProgram = (shadingCode) => `
+  "use strict"; 
+  const frameCount = ${frame}; 
+
+  for (let i = 0; i < numLines; i++) {
+    for (let di = 0; di <= 1; di++) {
+      for (let k = 0; k < kMax; k++) {
+        const i2 = i + di/2;
+        const a = (TWO_PI / numLines) * i2;
+        const r = k;
+
+
+        ${shadingCode};
+
+        noStroke();
+        const points = getShape(i2, k);
+        drawShape(points, 0.06);
+      }
+    }
+  }
+      
+`;
+
+
+  try {
+    eval(getShadingProgram(userCode));
+    lastValidCode = userCode;
+  } catch (e) {
+    console.error(e);
+
+    eval(getShadingProgram(lastValidCode));
+    return false;
+  }
+  return true;
+}
+
+
+
 let t = 0;
 
 function draw() {
@@ -141,51 +184,14 @@ function draw() {
     let {x1, y1, x2, y2} = getLinePoints(i);
     stroke(0, 100);
     // line(x1, y1, x2, y2);
-
-    for (let k = 0; k < kMax; k++) {
-      for (let di = 0; di <= 1; di++) {
-        const i2 = i + di/2;
-
-        // SPIRAL BAD
-        // let col = i2 + 10*k;
-        // col = col % (numLines + kMax);
-        // fill(0, 0, map(col, 0, numLines + kMax, 250, 30), 255);
-
-        
-        // if (i2*2 == (Math.floor(0.05*t) % (2*numLines))) {
-        //   shade(0);
-        // } else
-        // {
-        //   shadeGradient([0, 148, 255, 255], [0, 255, 144, 255], 1 - k / kMax);
-        // }
-
-        const angle = (TWO_PI / numLines) * i2;
-        shadeGradient(
-          // [0, 148, 255, 255],
-          // [0, 200, 200, 255],
-          [195, 204, 199, 255],
-          [16, 97, 153, 255],
-          // 0.5 + 0.5 * sin(2*(1+cos(0.025*t))*angle + k * 0.6 + t * 0.03)
-          0.5 + 0.5 * sin(angle + k * 0.6 )//+ t * 0.03)
-          
-        );
-
-
-
-        noStroke();
-        const points = getShape(i2, k);
-        drawShape(points, 0.06);
-
-        const result = '[' + points
-        .map(p => `(${Math.round(p.x)}, ${Math.round(p.y)})`)
-        .join(', ') + ']';
-        
-        // if (!window.BIGLOG) 
-        //   console.log(result)
-      }
-    }
   }
-  window.BIGLOG = true;
+
+  const success = drawShapes(t);
+  if (!success) {
+    document.getElementById("editor-holder").classList.add("error");
+  } else {
+    document.getElementById("editor-holder").classList.remove("error");
+  }
 
   drawBorder();
 

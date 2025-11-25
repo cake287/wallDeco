@@ -34,11 +34,12 @@ canvas {
   margin-left: 30px;
 
   width: 500px;
-  height: 80vh;
+  height: 95vh;
   position: relative;
 
   justify-content: center;
   display: flex;
+
 }
 #editor { 
     position: absolute;
@@ -46,6 +47,27 @@ canvas {
     right: 0;
     bottom: 0;
     left: 0;
+}
+
+#editor-holder::after {
+  content: "Error in program\aSee console for details";
+  white-space: pre;
+  color: #ca3636;
+  font-size: 24px;
+  font-weight: lighter;
+  font-family: sans-serif;
+  position: absolute;
+  top: 100%;
+  transform: translate(0, -200%);
+  text-align: center;
+  
+  transition-property: opacity;
+  transition-duration: 0.5s;
+
+  opacity: 0;
+}
+#editor-holder.error::after {
+  opacity: 1;
 }
 
   </style>
@@ -56,11 +78,44 @@ canvas {
 <div id="canvas-holder"></div>
 
 <div id="editor-holder">
-<div id="editor">function foo(items) {
-    var x = "All this is syntax highlighted";
-    return x;
-}</div>
+<div id="editor">// set p5.js fill style here
+
+// each shape is defined by polar coordinates
+r; // is a integer starting from 0 at center, increasing outwards
+a; // is angle of the centre of the shape in radians
+
+t; // is the current frame number
+
+
+function lerpFill(col1, col2, factor) {
+  let r = lerp(col1[0], col2[0], factor);
+  let g = lerp(col1[1], col2[1], factor);
+  let b = lerp(col1[2], col2[2], factor);
+  let a = lerp(col1[3], col2[3], factor);
+  fill(r, g, b, a);
+}
+
+const colours = [
+  [0, 148, 255, 255],
+  [0, 200, 200, 255],
+  [195, 204, 199, 255],
+  [16, 97, 153, 255],
+];
+
+lerpFill(
+  colours[2],
+  colours[3],
+
+  // 0.5 + 0.5 * sin(2*(1+cos(0.025*t))*a + r * 0.6 + t * 0.03)
+
+  0.5 + 0.5 * sin(a + r * 0.6 + t * 0.02)
+  
+);
 </div>
+</div>
+
+
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.5.0/ace.js" type="text/javascript" charset="utf-8"></script>
