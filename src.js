@@ -1,6 +1,6 @@
-const numLines = 35;
-const kMax = 8;
-const radius = 240;
+const numLines = 55;
+const kMax = 16;
+const radius = 70;
 
 let res;
 
@@ -83,10 +83,13 @@ function getShape(i, k) {
 }
 
 function drawShape(points, insetProportion=0) {
+  for (const point of points)
+    if (!point)
+      return;
+
   const centroid = points.reduce((acc, p) => ({x: acc.x + p.x / points.length, y: acc.y + p.y / points.length}), {x:0, y:0});
   if (insetProportion > 0) {
     points = points.map(p => {
-      let angle = atan2(p.y - centroid.y, p.x - centroid.x);
       return {
         x: centroid.x + (1 - insetProportion) * (p.x - centroid.x),
         y: centroid.y + (1 - insetProportion) * (p.y - centroid.y)
