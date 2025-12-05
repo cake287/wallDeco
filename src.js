@@ -1,6 +1,6 @@
-const numLines = 55;
+const numLines = 60;
 const kMax = 16;
-const radius = 70;
+const radius = 80;
 
 let res;
 
@@ -133,13 +133,20 @@ function shadeGradient(col1, col2, factor, steps=undefined) {
 
 
 let lastValidCode = "";
-function drawShapes(frame) {
+let startTime = null;
+function drawShapes() {
   // run user inputted shading program
+
+  if (!startTime) {
+    startTime = Date.now();
+  }
 
   const userCode = ace.edit("editor").getValue();
   const getShadingProgram = (shadingCode) => `
   "use strict"; 
-  const frameCount = ${frame}; 
+
+  const rMax = ${kMax};
+  const t = (${Date.now()} - ${startTime}) / 1000.0;
 
   for (let i = 0; i < numLines; i++) {
     for (let di = 0; di <= 1; di++) {
@@ -173,23 +180,22 @@ function drawShapes(frame) {
   return true;
 }
 
-
-
-let t = 0;
-
+let frame = 0;
 function draw() {
   background(255);
   // translate(width * 0.65, height * 0.45);
   translate(width * 0.5, height * 0.5);
 
-  for (let i = 0; i < numLines; i++) {
-    // draw tangent line
-    let {x1, y1, x2, y2} = getLinePoints(i);
-    stroke(0, 100);
-    // line(x1, y1, x2, y2);
+  if (false) {
+    // draw tangent lines
+    for (let i = 0; i < numLines; i++) {
+      let {x1, y1, x2, y2} = getLinePoints(i);
+      stroke(0, 100);
+      line(x1, y1, x2, y2);
+    }
   }
 
-  const success = drawShapes(t);
+  const success = drawShapes();
   if (!success) {
     document.getElementById("editor-holder").classList.add("error");
   } else {
@@ -198,5 +204,11 @@ function draw() {
 
   drawBorder();
 
-  t++;
+
+
+  frame++;
+}
+
+
+function keyPressed() {
 }
